@@ -1,0 +1,50 @@
+# Gran Vía Studio: "Što se dogodi kad stisneš gumb?"
+
+A 17-second Instagram reel (1080×1920, 30 fps) for [granviastudio.com.hr](https://granviastudio.com.hr). It's fully
+3D-animated in Blender and shows what a guest goes through at a Gran Vía photobooth, in one continuous story:
+
+| time | shot | on screen |
+|---|---|---|
+| 0.0–0.5 s | A mitten taps **DODIRNI ZA POČETAK** on the booth's touchscreen | Hook: *Što se dogodi kad stisneš gumb?* |
+| 0.5–3.7 s | The booth's own camera POV: 3‑2‑1, the bride sprints into place, four flashes (group, props, kiss, jump) | Viewfinder, countdown ring, FOTO 1/4…4/4 |
+| 3.7–7.0 s | The 2×6 strip prints out of the slot, showing the four photos just taken | *01 · Ispis na licu mjesta*: Fotografija u ruci *za 12 sekundi* |
+| 7.0–10.0 s | The strip falls into the guestbook; a guest writes *Živjeli mladenci!* and doodles a heart | *02 · Knjiga gostiju*: Fotka i poruka *za mladence* |
+| 10.0–13.0 s | Audio guestbook: a guest picks up the vintage phone, *beep*, leaves a message, laughs | *03 · Audio knjiga gostiju*: Glas koji ostaje *zauvijek* |
+| 13.0–14.5 s | Crane pull-back reveals the whole corner: arch with neon, booth, guestbook, phone, string lights | *Trenuci koje vrijedi čuvati* |
+| 14.5–17.0 s | End card in the brand's existing style | GRAN VÍA STUDIO · Rezervirajte *svoj datum* · @GRANVIASTUDIO |
+
+## Hook patterns used
+* **Open loop + question in frame 1.** The question in the headline only gets answered by watching.
+* **Start mid-action.** The first frame is a finger already on the button, with no logo intro.
+* **Countdown anticipation.** "3‑2‑1" makes people wait for the flash.
+* **Pattern interrupt on the beat.** The music drops exactly on the first camera flash, then four flashes in four beats.
+* **"Oddly satisfying" beats.** A strip stuttering out of a printer, handwriting appearing, a phone being picked up.
+* **Fast, beat-locked cuts.** Every shot change lands on the 120 BPM grid (1 beat = 15 frames).
+* **POV framing.** You literally see through the booth's camera.
+
+## What's original about it
+Everything was built from code for this reel; there is no stock footage, AI imagery or sample library:
+* **3D** (`blender/build_scene.py`): characters, booth (with the real "GRAN VÍA | STUDIO" lock-up under the screen),
+  flower arch (each rose is a generated spiral of petals), "Better Together" neon, guestbook, rotary phone with a
+  coiled cord, Dalmatian stone floor and string lights. The animation is written as Python functions and baked to
+  ordinary keyframes, so the `.blend` opens and scrubs normally in Blender 5.2.
+* **The printed strip is real.** The four photos on it are renders from the booth camera at the moment of each
+  flash, laid out like the real Gran Vía strips (logo, *Ana i Marko*, date).
+* **Sound** (`audio/soundtrack.py`): the music and every effect (beeps, shutter, printer motor, pen scratch, phone
+  pickup, the "voice message" babble) are synthesized with numpy.
+* **Typography** matches the existing reels: Playfair Display (with the italic second line) and Montserrat small
+  caps, both under the SIL OFL (licenses in `assets/fonts`). Caveat is used for handwriting and neon.
+
+## Files
+* `output/granvia-photobooth-reel.mp4`: the reel with music and sound effects.
+* `output/granvia-photobooth-reel-sfx-only.mp4`: the same video with sound effects only, so a trending Instagram
+  sound can be added in the app (keep the original audio at about 30–40% so the shutter clicks still land).
+* `output/cover.png`: a cover frame for the grid.
+
+## Rebuild
+```bash
+python3.13 -m venv venv && venv/bin/pip install bpy==5.2.3 pillow scipy
+PY=venv/bin/python ./make_reel.sh            # ~2 h on 4 CPU cores (Cycles)
+```
+Text, colours and timing are easy to change. Headlines are in `post/composite.py` (`BLOCKS`), couple names and date
+on the strip are in `post/make_textures.py`, and shot timing is in `blender/anim.py`.
