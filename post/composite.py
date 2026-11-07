@@ -18,7 +18,8 @@ from anim import (COUNTDOWN, END, FLASHES, FPS, RENDER_FRAMES, S1B, S2, S3, S4, 
 W, H = 1080, 1920
 FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "fonts")
 WHITE = (255, 255, 255)
-BLUSH = (236, 214, 200)      # the taupe/blush italic from the brand reels, lifted for dark backgrounds
+BLUSH = (236, 214, 200)      # the taupe/blush accent from the brand reels, lifted for dark backgrounds
+ITALIC = (255, 246, 238)     # over photos the brand reels set the italic line in (warm) white
 CREAM = (246, 240, 232)
 
 
@@ -68,7 +69,7 @@ def headline(eyebrow, l1, l2, top=300, start=0, end=60, delay=3):
         lines.append(Line(text_layer(eyebrow, F("Montserrat-Medium", 27), CREAM, tracking=0.32), y, 0))
         y += 78
     lines.append(Line(text_layer(l1, F("PlayfairDisplay-Regular", 78), WHITE), y, delay))
-    lines.append(Line(text_layer(l2, F("PlayfairDisplay-Italic", 78), BLUSH), y + 92, delay * 2))
+    lines.append(Line(text_layer(l2, F("PlayfairDisplay-Italic", 78), ITALIC), y + 92, delay * 2))
     return block(start, end, lines)
 
 
@@ -78,7 +79,7 @@ BLOCKS = [
     headline("01 · ISPIS NA LICU MJESTA", "Fotografija u ruci", "za 12 sekundi", start=S2[0] + 8, end=203),
     headline("02 · KNJIGA GOSTIJU", "Fotka i poruka", "za mladence", start=S3[0] + 4, end=S3[1] - 3),
     headline("03 · AUDIO KNJIGA GOSTIJU", "Glas koji ostaje", "zauvijek", start=S4[0] + 4, end=S4[1] - 3),
-    headline(None, "Trenuci koje", "vrijedi čuvati", top=280, start=S5[0] + 6, end=END[0] + 2),
+    headline(None, "Trenuci koje", "vrijedi čuvati", top=280, start=S5[0] + 15, end=END[0] + 2),
 ]
 
 
@@ -117,8 +118,8 @@ def paste_center(canvas, img, cx, cy, alpha=1.0, scale=1.0):
     canvas.alpha_composite(img, (int(cx - img.width / 2), int(cy - img.height / 2)))
 
 
-SCRIM_H = 820
-_scrim = np.clip(1 - np.arange(SCRIM_H) / SCRIM_H, 0, 1) ** 1.6 * 0.62
+SCRIM_H = 900
+_scrim = np.clip(1 - np.arange(SCRIM_H) / SCRIM_H, 0, 1) ** 1.25 * 0.7
 SCRIM = np.zeros((SCRIM_H, W, 4), dtype=np.uint8)
 SCRIM[..., 3] = (_scrim[:, None] * 255).astype(np.uint8)
 SCRIM = Image.fromarray(SCRIM, "RGBA")
@@ -212,11 +213,11 @@ def load_frame(frames_dir, f):
     return im
 
 
-def bloom(im, strength=0.42):
+def bloom(im, strength=0.36):
     small = im.resize((W // 4, H // 4), Image.BILINEAR)
     a = np.asarray(small).astype(np.float32) / 255
     lum = a.max(axis=2, keepdims=True)
-    hi = a * np.clip((lum - 0.72) / 0.28, 0, 1)
+    hi = a * np.clip((lum - 0.82) / 0.18, 0, 1)
     hi_img = Image.fromarray((hi * 255).astype(np.uint8))
     b1 = np.asarray(hi_img.filter(ImageFilter.GaussianBlur(6))).astype(np.float32)
     b2 = np.asarray(hi_img.filter(ImageFilter.GaussianBlur(20))).astype(np.float32)
