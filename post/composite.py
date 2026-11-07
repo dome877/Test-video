@@ -316,7 +316,7 @@ def main():
     stills = {int(x) for x in a.stills.split(",") if x.strip()}
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
     cmd = ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
-           "-i", "-", "-i", a.audio, "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-preset", "slow", "-crf", "15",
+           "-i", "-", "-i", a.audio, "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-preset", "slow", "-crf", "19",
            "-profile:v", "high", "-level", "4.2", "-pix_fmt", "yuv420p", "-colorspace", "bt709", "-color_primaries",
            "bt709", "-color_trc", "bt709", "-c:a", "aac", "-b:a", "256k", "-ar", "48000", "-shortest",
            "-movflags", "+faststart", a.out]
