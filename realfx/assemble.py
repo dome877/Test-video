@@ -159,7 +159,7 @@ def rec_overlay(im, f, start=322):
     card = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(card)
     cw, ch = 560, 118
-    cx, cy = W / 2, 545 + (1 - appear) * 30
+    cx, cy = W / 2, 1460 + (1 - appear) * 30     # lower third: clear of the headline and their faces
     x0, y0 = cx - cw / 2, cy - ch / 2
     d.rounded_rectangle([x0, y0, x0 + cw, y0 + ch], radius=59, fill=(18, 15, 14, int(150 * appear)))
     pulse = 0.6 + 0.4 * math.sin(t * 0.5)

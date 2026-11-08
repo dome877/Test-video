@@ -217,7 +217,7 @@ def principled(name, color, rough=0.5, metal=0.0, coat=0.0, emit=None, emit_str=
 
 
 def photo_strip_material(path):
-    m = principled("strip", "#FFFFFF", rough=0.25, coat=0.6)
+    m = principled("strip", "#FFFFFF", rough=0.45, coat=0.12)     # satin photo paper: no glare blow-outs
     nt = m.node_tree
     tex = nt.nodes.new("ShaderNodeTexImage")
     tex.image = bpy.data.images.load(path)
@@ -506,11 +506,11 @@ elif A.shot == "print":
     def strip_xf(lf):
         e_t = clamp((lf - 10) / 46)
         ext = L * (e_t - 0.8 * math.sin(2 * math.pi * 6 * e_t) / (2 * math.pi * 6))
-        droop = -0.06 * e_t
+        droop = 0.26 * e_t                  # exits tilted up a little, so the photos face the camera
         pos = slot + n * (ext - L) + v * sw * 0.0
         if lf >= 65:
             t = clamp((lf - 65) / 14)
-            droop = lerp(-0.06, -1.3, in_quad(t))
+            droop = lerp(0.26, -1.45, in_quad(t))
             pos = slot + n * 0.002
             if lf >= 76:
                 pos = pos + n * 0.03 * sw * (lf - 76) - v * 0.0024 * (lf - 76) ** 2 * (sw / 0.08)
@@ -533,8 +533,8 @@ elif A.shot == "print":
     sh.rotation_euler = frame_matrix(Vector(), u, v, n).to_euler()
     sh.scale = (sw * 1.6, sw * 1.3, 1)
     key(sh, "color", lambda f: (1, 1, 1, sh_xf(f)[1]), 4, range(N))
-    area("key", slot + n * 1.2 + v * 1.0 - u * 0.6, slot, 40, "#FFE3C2", size=1.0)
-    area("ring", slot + n * 0.9 + v * 0.6 + u * 1.0, slot, 25, "#F4F6FF", size=0.8)
+    area("key", slot + n * 1.2 + v * 1.0 - u * 0.6, slot, 20, "#FFE3C2", size=1.0)
+    area("ring", slot + n * 0.9 + v * 0.6 + u * 1.0, slot, 9, "#F4F6FF", size=0.8)
     goal = slot + n * L * 0.55
 
     def cam_xf(f):
@@ -678,7 +678,7 @@ elif A.shot == "phone":
     fu, fv, fn = Vector((1, 0, 0)), Vector((0, 1, 0)), Vector((0, 0, 1))
     table_h = 0.8
     top_c = Vector((0.02, 1.08, -0.4))
-    linen = principled("linen", "#EEE7DD", rough=0.85)
+    linen = principled("linen", "#D6CCC0", rough=0.9)
     bm = bmesh.new()
     bmesh.ops.create_cone(bm, cap_ends=True, segments=96, radius1=0.36, radius2=0.31, depth=table_h)
     for vtx in bm.verts:
@@ -782,8 +782,8 @@ elif A.shot == "phone":
     key(handset, "location", lambda f: tuple(hs_xf(f)[0]), 3, range(N))
     key(handset, "rotation_euler", lambda f: tuple(hs_xf(f)[1]), 3, range(N))
     tc = top_c + fv * 0.02
-    area("key", tc + fn * 1.4 - fu * 0.6 - fv * 0.4, tc, 28, "#FFE3C4", size=1.4)
-    area("rim", tc + fn * 0.9 + fu * 0.8 + fv * 1.2, tc, 30, "#F2F4FF", size=1.0)
+    area("key", tc + fn * 1.4 - fu * 0.6 - fv * 0.4, tc, 15, "#FFE3C4", size=1.4)
+    area("rim", tc + fn * 0.9 + fu * 0.8 + fv * 1.2, tc, 18, "#F2F4FF", size=1.0)
     sh = quad("phone_shadow", [Vector((-0.5, -0.5, 0)), Vector((0.5, -0.5, 0)), Vector((0.5, 0.5, 0)), Vector((-0.5, 0.5, 0))],
               [(0, 0), (1, 0), (1, 1), (0, 1)], shadow_decal("shadow", 0.55, 0.45))
     sh.matrix_world = frame_matrix(tc + fn * 0.001, fu, fv, fn) @ Matrix.Diagonal((0.36 * S, 0.34 * S, 1, 1))
