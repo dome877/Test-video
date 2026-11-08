@@ -437,19 +437,25 @@ def build_music():
     return mix * fade[:, None]
 
 
-def build_sfx():
+def build_sfx(real=False):
+    """real=True: the real-footage edit (no cartoon footsteps/pops/babble; laugh on the bride's real laugh)."""
     s = Bus()
     s.add(T(5.5), sfx_tap(), 0.9)
     for f, _ in [(15, "3"), (30, "2"), (45, "1")]:
         s.add(T(f), sfx_beep(988), 0.8)
     for k in range(6):
-        s.add(T(17 + 18 * k / 5) + 0.01, sfx_patter(), 0.55, pan=0.2)
+        if not real:
+            s.add(T(17 + 18 * k / 5) + 0.01, sfx_patter(), 0.55, pan=0.2)
     for f in FLASHES:
         s.add(T(f) - 0.01, sfx_shutter(), 1.0)
-    s.add(T(64), sfx_pop(420, 1000), 0.6, pan=0.3)       # mustache + sign pop in
-    s.add(T(66), sfx_pop(520, 1250), 0.5, pan=-0.3)
-    s.add(T(80), sfx_pop(650, 1500, 0.12), 0.65)          # heart
-    s.add(T(112), sfx_land(), 0.5)
+    if not real:
+        s.add(T(64), sfx_pop(420, 1000), 0.6, pan=0.3)       # mustache + sign pop in
+        s.add(T(66), sfx_pop(520, 1250), 0.5, pan=-0.3)
+        s.add(T(80), sfx_pop(650, 1500, 0.12), 0.65)          # heart
+        s.add(T(112), sfx_land(), 0.5)
+    else:
+        for fr in (15, 30, 45):                                # gold numbers popping up on the floor
+            s.add(T(fr), sfx_pop(380, 900, 0.1), 0.45, pan=0.1)
     s.add(T(122), sfx_printer(T(168) - T(122)), 1.0)
     s.add(T(168), sfx_cut(), 0.9)
     s.add(T(181), sfx_flutter(0.45), 1.0)
@@ -459,10 +465,14 @@ def build_sfx():
         s.add(T(a), sfx_scribble(T(b) - T(a), 10 + i), 1.0, pan=0.25)
     s.add(T(306), sfx_pickup(), 0.9, pan=0.15)
     s.add(T(318), sfx_beep(1000, 0.34), 0.55)
-    voice = sfx_babble(T(322), T(360))
-    s.add(T(322), phone_filter(voice), 0.85, pan=0.1)
-    s.add(T(362), phone_filter(sfx_laugh()), 0.9, pan=0.1)
-    s.add(T(377), phone_filter(sfx_babble(T(377), T(388))), 0.7, pan=0.1)
+    if not real:
+        voice = sfx_babble(T(322), T(360))
+        s.add(T(322), phone_filter(voice), 0.85, pan=0.1)
+        s.add(T(362), phone_filter(sfx_laugh()), 0.9, pan=0.1)
+        s.add(T(377), phone_filter(sfx_babble(T(377), T(388))), 0.7, pan=0.1)
+    else:
+        s.add(T(358), phone_filter(sfx_laugh()), 0.8, pan=0.1)
+        s.add(T(368), phone_filter(sfx_laugh()), 0.55, pan=-0.1)
     s.add(T(388), sfx_whoosh(T(434) - T(388), up=True, peak_at=0.5), 0.55)
     for k, n in enumerate(["G5", "B5", "D6", "G6"]):
         s.add(T(392) + 0.07 * k, bell(note(n), 0.9), 0.45, pan=-0.3 + 0.2 * k)
@@ -491,9 +501,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--sfx-only", default="")
+    ap.add_argument("--real", action="store_true", help="sound design for the real-footage edit")
     a = ap.parse_args()
     music = build_music()
-    sfx = build_sfx()
+    sfx = build_sfx(real=a.real)
     write_wav(a.out, master(music * 0.62 + sfx * 1.0))
     if a.sfx_only:
         write_wav(a.sfx_only, master(sfx))
